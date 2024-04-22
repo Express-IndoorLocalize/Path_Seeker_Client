@@ -152,9 +152,9 @@ export default function Navigation({navigation}: any) {
             transform: [{rotate: `${angle}deg`}],
           },
         ]}
-        name="navigation"
+        name="pin"
         color={'red'}
-        size={30}
+        size={20}
       />
     </View>
   );
