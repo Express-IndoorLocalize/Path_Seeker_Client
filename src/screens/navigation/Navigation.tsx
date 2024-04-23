@@ -12,7 +12,7 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import WifiManager from 'react-native-wifi-reborn';
 import {PermissionsAndroid} from 'react-native';
 import {Dimensions} from 'react-native';
-import RNFS from 'react-native-fs';
+import * as RNFS from 'react-native-fs';
 
 const screenWidth = Dimensions.get('window').width;
 const screenHeight = Dimensions.get('window').height;
@@ -78,15 +78,39 @@ export default function Navigation({navigation}: any) {
       WifiManager.loadWifiList().then((list: any) => {
         const positionData = {
           projectId: 0,
-          CalibrationPointId: n,
+          calibrationpointID: n,
           received_signals: [],
           position: {x: 0, y: 0},
         };
         positionData.received_signals = list;
         positionData.position = markerPosition;
         setN(n + 1);
-        console.log('positionData: ',positionData);
-        setMapCalibrations([...mapCalibrations,positionData]);
+        (positionData as any).position.floor = 2;
+        const json_to_send = JSON.stringify(modifyJson(positionData))
+        const url = "http://10.10.23.233:3000/api/calibrating/create_fingerprint"
+
+        const requestOptions = {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: json_to_send
+        };
+        fetch(url, requestOptions)
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Network response was not ok');
+          }
+          return response.json();
+        })
+        .then(data => {
+          // Handle response data
+          console.log('Response:', data);
+        })
+        .catch(error => {
+          // Handle errors
+          console.error('There was a problem with the POST request:', error);
+        });
       });
     } catch (e) {
       console.error('Error saving location:', e);
@@ -95,10 +119,11 @@ export default function Navigation({navigation}: any) {
 
   const handleDownload = async () => { 
     try {
-      const filePath = RNFS.DocumentDirectoryPath + '/mapCalibrations.json';
-      RNFS.writeFile(filePath, JSON.stringify(mapCalibrations), 'utf8')
-      .then((success) => {
-        console.log('FILE WRITTEN!',success);
+      var filePath = RNFS.DocumentDirectoryPath + '/mapCalibrations.txt';
+      const ll =  JSON.stringify(mapCalibrations)
+      RNFS.writeFile(filePath,'sdasdawdawdawd', 'utf8')
+      .then(() => {
+        console.log('FILE WRITTEN!',);
         console.log('Download the file from:', filePath);
       })
       .catch((err) => {
@@ -108,6 +133,23 @@ export default function Navigation({navigation}: any) {
       console.error('Error saving map calibrations:', error);
     }
   };
+
+  const modifyJson = (json) => {
+    json.received_signals.forEach(signal => {
+        signal.bssid = signal.BSSID;
+        signal.ssid = signal.SSID;
+        signal.rss = signal.level;
+        delete signal.BSSID;
+        delete signal.SSID;
+        delete signal.level;
+        delete signal.capabilities;
+        delete signal.timestamp;
+    });
+
+    return json;
+  };
+
+  
 
   // useEffect(() => {
   //   permission()
