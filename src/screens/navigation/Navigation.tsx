@@ -88,7 +88,7 @@ export default function Navigation({navigation,route}: any) {
         setN(n + 1);
         (positionData as any).position.floor = 2;
         const json_to_send = JSON.stringify(modifyJson(positionData))
-        const url = "http://10.10.23.233:3000/api/calibrating/create_fingerprint"
+        const url = "https://indoor-localize-server.onrender.com/api/calibrating/create_fingerprint"
 
         const requestOptions = {
           method: 'POST',
