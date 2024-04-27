@@ -5,7 +5,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import {
   Maps,
   Welcome,
-  Live,
+  Calibration,
   Navigation,
   AdminLogin
 } from '../screens';
@@ -31,7 +31,7 @@ function AdminNavigation(){
   return(
     <Stack.Navigator screenOptions={{headerShown:false}}>
       <Stack.Screen name='adminMaps' component={Maps} />
-      <Stack.Screen name='live' component={Navigation} />
+      <Stack.Screen name='calibration' component={Calibration} />
     </Stack.Navigator>
   );
 }

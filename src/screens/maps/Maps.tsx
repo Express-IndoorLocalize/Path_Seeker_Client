@@ -11,6 +11,7 @@ import {
 } from "react-native";
 import SearchBarCustom from "../../components/searchBar/searchBar";
 import HeaderOptions from "../../components/headerBar/HeaderBar";
+import { useLogin } from '../../context/LoginProvider';
 import { allMaps } from "./mapData";
 
 
@@ -19,6 +20,8 @@ export default function Maps({ navigation }:any) {
     const [filterList, setFilterList] = useState<any[]|[]>([]);
     const [allScannedDocsForUser, setAllScannedDocsForUser] = useState<any[]|[]>([]);
     const [isLayoutEffectRendered, setLayoutEffectRendered] = useState(false);
+
+    const loginContext = useLogin();
 
     HeaderOptions({navigation, refreshing, setLayoutEffectRendered});
 
@@ -44,7 +47,8 @@ export default function Maps({ navigation }:any) {
   };
 
   const handleCardPress = (item:any) => {
-    navigation.navigate('live', {
+    const path = loginContext.isLoggedIn ? 'calibration' : 'live';
+    navigation.navigate(path, {
       mapDetails: item,
     });
   };

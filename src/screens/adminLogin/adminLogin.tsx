@@ -20,7 +20,7 @@ export default function AdminLogin({ navigation }: any) {
         try {
             setLoader(true)
             // eslint-disable-next-line eqeqeq
-            if (values.email == 'admin@gmail.com' && values.password == 'Test1') {
+            if (values.email == 'admin@ps.com' && values.password == 'Test1') {
                 setLoader(false)
                 if (setIsLoggedIn) {
                     setIsLoggedIn(true);
