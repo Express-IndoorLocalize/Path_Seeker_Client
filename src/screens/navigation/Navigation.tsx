@@ -17,7 +17,8 @@ import * as RNFS from 'react-native-fs';
 const screenWidth = Dimensions.get('window').width;
 const screenHeight = Dimensions.get('window').height;
 
-export default function Navigation({navigation}: any) {
+export default function Navigation({navigation,route}: any) {
+  const { mapDetails }: any = route.params;
   const [markerPosition, setMarkerPosition] = useState({x: 120, y: 620});
   const [n, setN] = useState(0);
   const [mapCalibrations, setMapCalibrations] = useState([
@@ -134,7 +135,7 @@ export default function Navigation({navigation}: any) {
     }
   };
 
-  const modifyJson = (json) => {
+  const modifyJson = (json:any) => {
     json.received_signals.forEach(signal => {
         signal.bssid = signal.BSSID;
         signal.ssid = signal.SSID;
@@ -148,23 +149,6 @@ export default function Navigation({navigation}: any) {
 
     return json;
   };
-
-  
-
-  // useEffect(() => {
-  //   permission()
-  //   WifiManager.getCurrentWifiSSID().then(
-  //     ssid => {
-  //       console.log('Your current connected wifi SSID is ' + ssid);
-  //     },
-  //     () => {
-  //       console.log('Cannot get current SSID!');
-  //     }
-  //   );
-  //   WifiManager.loadWifiList().then((list: any) => {
-  //     console.log('list: ', list);
-  //   })
-  // }, []);
 
   return (
     <View style={styles.container}>

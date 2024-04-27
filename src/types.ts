@@ -3,6 +3,11 @@ export type LoginContextType = {
     setIsLoggedIn?: (value: boolean) => void;
 };
 
+export type LoginDataType = {
+    email?: string;
+    password?: string;
+}
+
 export type User = {
     fullName: string;
     email: string;
