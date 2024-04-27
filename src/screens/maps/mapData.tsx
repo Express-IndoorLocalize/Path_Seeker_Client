@@ -12,7 +12,7 @@ export const allMaps = [
         id:'1',
         buildingId: '0',
         floorId: '1',
-        buildingName: 'Sumanadasa Building',
+        buildingName: 'Civil Building',
         floorName: '1st Floor',
         map: '../../assets/maps/indoorMap.png',
         description: 'Sumanadasa is a historic building nestled within the University of Moratuwa. It serves as a hub for academic pursuits, housing four prominent faculties:',

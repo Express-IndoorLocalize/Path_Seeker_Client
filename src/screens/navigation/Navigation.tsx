@@ -1,4 +1,4 @@
-import {useEffect, useState} from 'react';
+import { useEffect, useState } from 'react';
 import {
   View,
   Image,
@@ -6,42 +6,32 @@ import {
   PanResponder,
   Text,
   TouchableOpacity,
+  ActivityIndicator,
 } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import Toast from 'react-native-toast-message';
 import WifiManager from 'react-native-wifi-reborn';
-import {PermissionsAndroid} from 'react-native';
-import {Dimensions} from 'react-native';
-import * as RNFS from 'react-native-fs';
+import { PermissionsAndroid } from 'react-native';
+import { Dimensions } from 'react-native';
+import { Button, DropdownComponent } from '../../components';
+import Modal from "react-native-modal";
+import { locations } from './lacations';
 
 const screenWidth = Dimensions.get('window').width;
 const screenHeight = Dimensions.get('window').height;
 
-export default function Navigation({navigation,route}: any) {
+export default function Navigation({ navigation, route }: any) {
   const { mapDetails }: any = route.params;
-  const [markerPosition, setMarkerPosition] = useState({x: 120, y: 620});
+  const [markerPosition, setMarkerPosition] = useState({ x: 120, y: 620 });
   const [n, setN] = useState(0);
-  const [mapCalibrations, setMapCalibrations] = useState([
-    {
-      projectId: 0,
-      CalibrationPointId: n,
-      received_signals: [],
-      position: {x: 120, y: 300},
-    },
-  ]);
   const [angle, setAngle] = useState(0);
+  const [loader, setLoader] = useState(false);
   const [wifiList, setWifiList] = useState([]);
+  const [currentLocation, setCurrentLocation] = useState(null);
+  const [destinationLocation, setDestinationLocation] = useState(null);
+
   const indoorMap = require('../../assets/maps/indoorMap.png');
-
-  const handlePanResponderGrant = (event: any, gestureState: any) => {
-    const {x0, y0} = gestureState;
-    setMarkerPosition({x: x0 - 10, y: y0 - 10});
-  };
-
-  const panResponder = PanResponder.create({
-    onStartShouldSetPanResponder: () => true,
-    onPanResponderGrant: handlePanResponderGrant,
-  });
 
   const permission = async () => {
     try {
@@ -65,109 +55,23 @@ export default function Navigation({navigation,route}: any) {
     }
   };
 
-  const handleSaveLocation = async () => {
+  const handleNavigate = async () => {
     try {
-      permission();
-      WifiManager.getCurrentWifiSSID().then(
-        ssid => {
-          console.log('Your current connected wifi SSID is ' + ssid);
-        },
-        () => {
-          console.log('Cannot get current SSID!');
-        },
-      );
-      WifiManager.loadWifiList().then((list: any) => {
-        const positionData = {
-          projectId: 0,
-          calibrationpointID: n,
-          received_signals: [],
-          position: {x: 0, y: 0},
-        };
-        positionData.received_signals = list;
-        positionData.position = markerPosition;
-        setN(n + 1);
-        (positionData as any).position.floor = 2;
-        const json_to_send = JSON.stringify(modifyJson(positionData))
-        const url = "https://indoor-localize-server.onrender.com/api/calibrating/create_fingerprint"
-
-        const requestOptions = {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: json_to_send
-        };
-        fetch(url, requestOptions)
-        .then(response => {
-          if (!response.ok) {
-            throw new Error('Network response was not ok');
-          }
-          return response.json();
-        })
-        .then(data => {
-          // Handle response data
-          console.log('Response:', data);
-        })
-        .catch(error => {
-          // Handle errors
-          console.error('There was a problem with the POST request:', error);
-        });
-      });
+      console.log('currentLocation: ',currentLocation);
+      console.log('destinationLocation: ',destinationLocation);
     } catch (e) {
       console.error('Error saving location:', e);
     }
   };
 
-  const handleDownload = async () => { 
-    try {
-      var filePath = RNFS.DocumentDirectoryPath + '/mapCalibrations.txt';
-      const ll =  JSON.stringify(mapCalibrations)
-      RNFS.writeFile(filePath,'sdasdawdawdawd', 'utf8')
-      .then(() => {
-        console.log('FILE WRITTEN!',);
-        console.log('Download the file from:', filePath);
-      })
-      .catch((err) => {
-        console.log(err.message);
-      });
-    } catch (error) {
-      console.error('Error saving map calibrations:', error);
-    }
-  };
-
-  const modifyJson = (json:any) => {
-    json.received_signals.forEach(signal => {
-        signal.bssid = signal.BSSID;
-        signal.ssid = signal.SSID;
-        signal.rss = signal.level;
-        delete signal.BSSID;
-        delete signal.SSID;
-        delete signal.level;
-        delete signal.capabilities;
-        delete signal.timestamp;
-    });
-
-    return json;
-  };
-
   return (
     <View style={styles.container}>
+
       <Image
         source={indoorMap}
         style={styles.image}
         resizeMode="contain"
-        {...panResponder.panHandlers}
       />
-
-      <TouchableOpacity style={styles.saveButton} onPress={handleSaveLocation}>
-        <Icon name="save" size={30} color="black" />
-        <Text style={styles.buttonText}>save</Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity style={styles.exportButton} onPress={handleDownload}>
-        <Icon name="download" size={30} color="black" />
-        <Text style={styles.buttonText}>down</Text>
-      </TouchableOpacity>
 
       <MaterialCommunityIcons
         style={[
@@ -175,12 +79,29 @@ export default function Navigation({navigation,route}: any) {
           {
             left: markerPosition.x,
             top: markerPosition.y,
-            transform: [{rotate: `${angle}deg`}],
+            transform: [{ rotate: `${angle}deg` }],
           },
         ]}
-        name="pin"
+        name="navigation"
         color={'red'}
         size={20}
+      />
+
+      <DropdownComponent isDestination={false} locationValue={currentLocation} setLocation={setCurrentLocation} locations={locations} style={styles.dropDownStyle}/>
+      <DropdownComponent isDestination={true} locationValue={destinationLocation} setLocation={setDestinationLocation} locations={locations} style={styles.dropDownStyle}/>
+      <Button
+        onPress={handleNavigate}
+        title={loader ? <ActivityIndicator size="small" color="#FFFFFF" /> : "Navigate"}
+        disabled={loader}
+        filled
+        style={styles.saveButton}
+        isCalibrate={true}
+      />
+
+      <Toast
+        autoHide={true}
+        visibilityTime={7000}
+        position='top'
       />
     </View>
   );
@@ -197,23 +118,51 @@ const styles = StyleSheet.create({
   },
   marker: {
     position: 'absolute',
-    // Set marker styles as needed
   },
   saveButton: {
     position: 'absolute',
-    top: 20,
-    right: 10,
-    borderRadius: 20,
-    // backgroundColor: 'black',
+    right: 20,
+    width: '30%',
+    bottom: 20,
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 10,
+    elevation: 2,
+    alignSelf: 'center',
   },
-  exportButton: {
+  dropDownStyle: {
+    backgroundColor: 'white',
+    paddingLeft: 20,
+    padding: 3,
+  },
+  navigationContainer: {
+    position: 'relative',
+    flexDirection: 'row',
+    bottom: 15,
+  },
+  x: {
     position: 'absolute',
-    top: 200,
-    right:5,
-    borderRadius: 20,
-    // backgroundColor: 'black',
+    left: 10,
+    bottom: 33,
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 10,
+    elevation: 2,
+  },
+  y: {
+    position: 'absolute',
+    left: 10,
+    bottom: 15,
+    flexDirection: 'row', // Arrange texts horizontally
+    alignItems: 'center',
+    paddingHorizontal: 10,
+    elevation: 2,
   },
   buttonText: {
     color: 'black',
+  },
+  xyText: {
+    color: 'black',
+    fontWeight: 'bold',
   },
 });

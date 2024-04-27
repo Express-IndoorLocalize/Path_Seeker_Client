@@ -42,7 +42,7 @@ export default function Welcome({ navigation }){
             </Block>
             <Block style={styles.subTitle}>
               <Text color="white" size={16}>
-                Fully coded React Native components.
+                The wireless indoor location system works by defining coordinates using Wi-Fi access points that can transmit certain data. Using the RSSI and MAC-address.
               </Text>
             </Block>
           </Block>

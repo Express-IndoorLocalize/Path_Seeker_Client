@@ -1,13 +1,13 @@
 import { useEffect, useState } from "react";
-import SearchBar from "react-native-dynamic-search-bar";
+import { SearchBar } from 'react-native-elements';
 import { View } from "react-native";
 
 export default function SearchBarCustom({ setFilterList, originalList }:any) {
-    const [spinnerVisibility, setSpinnerVisibility] = useState(false);
     const [placeholderIndex, setPlaceholderIndex] = useState(0);
+    const [search, setSearch] = useState('');
 
     const placeholders = [
-        "Search any document ...",
+        "Search any map ...",
         "Try searching by floor name...",
         "Try searching by building name...",
         "Try searching by description...",
@@ -23,7 +23,7 @@ export default function SearchBarCustom({ setFilterList, originalList }:any) {
     }, []);
 
     const onChangeText = (text:string)=> {
-        setSpinnerVisibility(true)
+        setSearch(text);
         const lowerCaseSearch = text.toLowerCase();
         const searchedList = originalList.filter((doc) => {
           return Object.values(doc).some((value) =>
@@ -32,7 +32,6 @@ export default function SearchBarCustom({ setFilterList, originalList }:any) {
         });
         setFilterList(searchedList);
         setTimeout(() => {
-            setSpinnerVisibility(false)
         }, 1500);
     }
 
@@ -41,13 +40,15 @@ export default function SearchBarCustom({ setFilterList, originalList }:any) {
             marginVertical: 12,
         }}>
             <SearchBar
-                spinnerVisibility={spinnerVisibility}
                 placeholder={placeholders[placeholderIndex]}
                 onChangeText={(text)=>onChangeText(text)}
-                onSearchPress={() => console.log("Search Icon is pressed")}
-                onClearPress={() => setFilterList(originalList)}
-                onPress={() => alert("onPress")}
-                textInputStyle={{color:'black'}}
+                value={search}
+                lightTheme = {true}
+                inputStyle={{ backgroundColor: 'white' }} 
+                inputContainerStyle={{ backgroundColor: 'white' }} 
+                containerStyle={{ backgroundColor: 'white' }} 
+                leftIconContainerStyle={{ backgroundColor: 'white' }} 
+                rightIconContainerStyle={{ backgroundColor: 'white' }} 
             />
         </View>
     )

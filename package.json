@@ -25,6 +25,7 @@
     "react-native": "0.73.7",
     "react-native-dynamic-search-bar": "^2.0.2",
     "react-native-element-dropdown": "^2.10.4",
+    "react-native-elements": "^3.4.3",
     "react-native-fs": "^2.20.0",
     "react-native-maps": "^1.14.0",
     "react-native-modal": "^13.0.1",
