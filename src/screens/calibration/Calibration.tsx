@@ -91,7 +91,7 @@ export default function Calibration({ navigation, route }: any) {
         setN(n + 1);
         (positionData as any).position.floor = 2;
         const json_to_send = JSON.stringify(modifyJson(positionData))
-        const url = 'https://indoor-localize-server.onrender.com/api/calibrating/create_fingerprint'
+        const url = 'https://indoor-localize-server.onrender.com/api/calibrating/create_fingerprint';
         setLoader(true)
         const requestOptions = {
           method: 'POST',
@@ -129,6 +129,7 @@ export default function Calibration({ navigation, route }: any) {
           });
       });
     } catch (e) {
+      setLoader(false);
       console.error('Error saving location:', e);
     }
   };

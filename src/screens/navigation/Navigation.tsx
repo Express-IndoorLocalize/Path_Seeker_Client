@@ -24,14 +24,23 @@ const screenHeight = Dimensions.get('window').height;
 export default function Navigation({ navigation, route }: any) {
   const { mapDetails }: any = route.params;
   const [markerPosition, setMarkerPosition] = useState({ x: 120, y: 620 });
-  const [n, setN] = useState(0);
   const [angle, setAngle] = useState(0);
   const [loader, setLoader] = useState(false);
-  const [wifiList, setWifiList] = useState([]);
   const [currentLocation, setCurrentLocation] = useState(null);
   const [destinationLocation, setDestinationLocation] = useState(null);
+  const [isNavigating, setNavigating] = useState<boolean>(false);
+
 
   const indoorMap = require('../../assets/maps/indoorMap.png');
+
+  useEffect(() => {
+    const intervalId = setInterval(async () => {
+      if (!isNavigating) {
+        await getLiveLocation();
+      }
+    }, 3000);
+    return () => clearInterval(intervalId);
+  }, []);
 
   const permission = async () => {
     try {
@@ -55,13 +64,117 @@ export default function Navigation({ navigation, route }: any) {
     }
   };
 
-  const handleNavigate = async () => {
+  const modifyJson = (json: any) => {
+    json.received_signals.forEach(signal => {
+      signal.bssid = signal.BSSID;
+      signal.ssid = signal.SSID;
+      signal.rss = signal.level;
+      delete signal.BSSID;
+      delete signal.SSID;
+      delete signal.level;
+      delete signal.capabilities;
+      delete signal.timestamp;
+    });
+
+    return json;
+  };
+
+  const getLiveLocation = async () => {
     try {
-      console.log('currentLocation: ',currentLocation);
-      console.log('destinationLocation: ',destinationLocation);
+      permission();
+      WifiManager.getCurrentWifiSSID().then(
+        ssid => {
+          console.log('Your current connected wifi SSID is ' + ssid);
+        },
+        () => {
+          console.log('Cannot get current SSID!');
+        },
+      );
+      WifiManager.loadWifiList().then((list: any) => {
+        const positionData = {
+          projectId: 0,
+          received_signals: [],
+        };
+        positionData.received_signals = list;
+        const json_to_send = JSON.stringify(modifyJson(positionData));
+        console.log('json_to_send: ', json_to_send);
+        const url = 'https://indoor-localize-server.onrender.com/api/positioning/calculate_position';
+        const requestOptions = {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: json_to_send
+        };
+        console.log('getting live location');
+        fetch(url, requestOptions)
+          .then(response => {
+            if (!response.ok) {
+              throw new Error('Network response was not ok');
+            }
+            return response.json();
+          })
+          .then(data => {
+            // Handle response data
+            console.log('live updating:', data);
+            const liveLoc = { x: data?.message?.x, y: data?.message?.y };
+            setMarkerPosition(liveLoc);
+          })
+          .catch(error => {
+            // Handle errors
+            console.error('There was a problem with the POST request:', error);
+          });
+      });
     } catch (e) {
+      console.error('Error getting live location:', e);
+    }
+  };
+
+  const handleNavigate = async () => {
+    setNavigating(true);
+    try {
+      setLoader(true);
+      const postData = {
+        'projectId': 0,
+        'start_point': currentLocation,
+        'goal': destinationLocation
+      }
+      const json_to_send = JSON.stringify(postData)
+      const url = 'https://indoor-localize-server.onrender.com/api/navigating/get_path';
+      const requestOptions = {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: json_to_send,
+      };
+      fetch(url, requestOptions)
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Network response was not ok');
+          }
+          return response.json();
+        })
+        .then(data => {
+          // Handle response data
+          setLoader(false);
+          console.log('getting navigation path:', data);
+        })
+        .catch(error => {
+          setLoader(false);
+          Toast.show({
+            type: 'error',
+            text1: 'Navigation failed',
+            text2: 'Server error',
+          });
+          console.error('There was a problem with the POST request:', error);
+        });
+    } catch (e) {
+      setLoader(false);
       console.error('Error saving location:', e);
     }
+    setLoader(false);
+    setNavigating(false);
   };
 
   return (
@@ -87,8 +200,8 @@ export default function Navigation({ navigation, route }: any) {
         size={20}
       />
 
-      <DropdownComponent isDestination={false} locationValue={currentLocation} setLocation={setCurrentLocation} locations={locations} style={styles.dropDownStyle}/>
-      <DropdownComponent isDestination={true} locationValue={destinationLocation} setLocation={setDestinationLocation} locations={locations} style={styles.dropDownStyle}/>
+      <DropdownComponent isDestination={false} locationValue={currentLocation} setLocation={setCurrentLocation} locations={locations} style={styles.dropDownStyle} />
+      <DropdownComponent isDestination={true} locationValue={destinationLocation} setLocation={setDestinationLocation} locations={locations} style={styles.dropDownStyle} />
       <Button
         onPress={handleNavigate}
         title={loader ? <ActivityIndicator size="small" color="#FFFFFF" /> : "Navigate"}
