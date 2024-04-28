@@ -15,6 +15,7 @@ const DropdownComponent = (props:any) => {
         placeholderStyle={styles.placeholderStyle}
         selectedTextStyle={styles.selectedTextStyle}
         inputSearchStyle={styles.inputSearchStyle}
+        itemTextStyle={styles.itemStyle}
         iconStyle={styles.iconStyle}
         data={data}
         search
@@ -58,6 +59,7 @@ const styles = StyleSheet.create({
     borderWidth: 0.5,
     borderRadius: 8,
     paddingHorizontal: 8,
+    textDecorationColor: 'black',
   },
   icon: {
     marginRight: 5,
@@ -73,9 +75,16 @@ const styles = StyleSheet.create({
   },
   placeholderStyle: {
     fontSize: 10,
+    color: 'black',
+  },
+  itemStyle: {
+    fontSize: 10,
+    color: 'black',
   },
   selectedTextStyle: {
     fontSize: 10,
+    color: 'black',
+    textDecorationColor: 'black',
   },
   iconStyle: {
     width: 20,
@@ -84,5 +93,6 @@ const styles = StyleSheet.create({
   inputSearchStyle: {
     height: 40,
     fontSize: 10,
+    color: 'black',
   },
 });

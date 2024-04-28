@@ -23,17 +23,8 @@ export default function Calibration({ navigation, route }: any) {
   const { mapDetails }: any = route.params;
   const [markerPosition, setMarkerPosition] = useState({ x: 120, y: 620 });
   const [n, setN] = useState(0);
-  const [mapCalibrations, setMapCalibrations] = useState([
-    {
-      projectId: 0,
-      CalibrationPointId: n,
-      received_signals: [],
-      position: { x: 120, y: 300 },
-    },
-  ]);
   const [angle, setAngle] = useState(0);
   const [loader, setLoader] = useState(false);
-  const [wifiList, setWifiList] = useState([]);
   const indoorMap = require('../../assets/maps/indoorMap.png');
 
   const handlePanResponderGrant = (event: any, gestureState: any) => {

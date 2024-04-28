@@ -2,21 +2,16 @@ import { useEffect, useState } from 'react';
 import {
   View,
   Image,
-  StyleSheet,
-  PanResponder,
-  Text,
-  TouchableOpacity,
-  ActivityIndicator,
+  StyleSheet, ActivityIndicator
 } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import Icon from 'react-native-vector-icons/FontAwesome';
 import Toast from 'react-native-toast-message';
 import WifiManager from 'react-native-wifi-reborn';
 import { PermissionsAndroid } from 'react-native';
 import { Dimensions } from 'react-native';
 import { Button, DropdownComponent } from '../../components';
-import Modal from "react-native-modal";
-import { locations } from './lacations';
+import { locations } from './locations';
+import NavPath from './pathBuilder';
 
 const screenWidth = Dimensions.get('window').width;
 const screenHeight = Dimensions.get('window').height;
@@ -27,8 +22,10 @@ export default function Navigation({ navigation, route }: any) {
   const [angle, setAngle] = useState(0);
   const [loader, setLoader] = useState(false);
   const [currentLocation, setCurrentLocation] = useState(null);
+  const [navigatingCoordinates, setNavigatingCoordinates] = useState([]);
   const [destinationLocation, setDestinationLocation] = useState(null);
   const [isNavigating, setNavigating] = useState<boolean>(false);
+  const [userNeedsNavigating, setUserNeedsNavigating] = useState<boolean>(false);
 
 
   const indoorMap = require('../../assets/maps/indoorMap.png');
@@ -132,6 +129,9 @@ export default function Navigation({ navigation, route }: any) {
 
   const handleNavigate = async () => {
     setNavigating(true);
+    setUserNeedsNavigating(true);
+    setNavigatingCoordinates([]);
+
     try {
       setLoader(true);
       const postData = {
@@ -159,6 +159,8 @@ export default function Navigation({ navigation, route }: any) {
           // Handle response data
           setLoader(false);
           console.log('getting navigation path:', data);
+          const allCoordinates = data?.data?.coordinates;
+          setNavigatingCoordinates(allCoordinates);
         })
         .catch(error => {
           setLoader(false);
@@ -197,8 +199,10 @@ export default function Navigation({ navigation, route }: any) {
         ]}
         name="navigation"
         color={'red'}
-        size={20}
+        size={30}
       />
+
+      <NavPath userNeedsNavigating={userNeedsNavigating} coordinates={navigatingCoordinates}/>
 
       <DropdownComponent isDestination={false} locationValue={currentLocation} setLocation={setCurrentLocation} locations={locations} style={styles.dropDownStyle} />
       <DropdownComponent isDestination={true} locationValue={destinationLocation} setLocation={setDestinationLocation} locations={locations} style={styles.dropDownStyle} />

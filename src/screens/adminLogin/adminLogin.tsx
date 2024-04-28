@@ -108,7 +108,8 @@ export default function AdminLogin({ navigation }: any) {
                                             placeholderTextColor={COLORS.black}
                                             keyboardType='email-address'
                                             style={{
-                                                width: "100%"
+                                                width: "100%",
+                                                color: "black"
                                             }}
                                         />
                                     </View>
@@ -142,7 +143,8 @@ export default function AdminLogin({ navigation }: any) {
                                             placeholderTextColor={COLORS.black}
                                             secureTextEntry={isPasswordHide}
                                             style={{
-                                                width: "100%"
+                                                width: "100%",
+                                                color: "black"
                                             }}
                                         />
                                         <TouchableOpacity
