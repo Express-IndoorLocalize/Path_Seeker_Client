@@ -25,7 +25,7 @@ export default function Calibration({ navigation, route }: any) {
   const [n, setN] = useState(0);
   const [angle, setAngle] = useState(0);
   const [loader, setLoader] = useState(false);
-  const indoorMap = require('../../assets/maps/indoorMap.png');
+  const indoorMap = require('../../assets/maps/gridMap.png');
 
   const handlePanResponderGrant = (event: any, gestureState: any) => {
     const { x0, y0 } = gestureState;
