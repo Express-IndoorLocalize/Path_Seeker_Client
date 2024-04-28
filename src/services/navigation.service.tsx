@@ -1,5 +1,5 @@
-import fs from 'fs';
 import { getMapGraphById } from '../controllers/mapGraph.controller';
+import { nodes } from '../assets/jsons/nodes';
 
 // Define types
 interface NodeCoordinates {
@@ -10,10 +10,7 @@ interface Graph {
     [key: string]: Array<[string, number]>; // Assuming graph is represented as { node: [[neighbor, weight]] }
 }
 
-// Read coordinates from JSON
-const coordinates: NodeCoordinates = JSON.parse(
-    fs.readFileSync('../assets/jsons/nodes.json', 'utf8')
-);
+
 
 // Heuristic function
 const heuristic = (node: string, goal: string): number => {
@@ -21,8 +18,8 @@ const heuristic = (node: string, goal: string): number => {
 };
 
 // Function to get coordinates
-function getCoordinates(nodes: string[]): Array<[number, number]> {
-    return nodes.map(node => coordinates[node]);
+function getCoordinates(nodes_sent: string[]): Array<[number, number]> {
+    return nodes_sent.map(node => nodes[node]);
 }
 
 // A* search algorithm

@@ -1,4 +1,4 @@
-[{
+export const mapgraphs = [{
   "_id": {
     "$oid": "662cab0b7310cbc38d09b44d"
   },
