@@ -42,10 +42,10 @@ interface Position {
     floor: number;
 }
 
-const calculatePosition = async (req: { projectId: string; received_signals: Signal[] }): Promise<Position | void> => {
+const calculatePosition = async (projectId: string, received_signals: Signal[]): Promise<Position | void> => {
     try {
-        const projectId = req.projectId;
-        const received_signals = req.received_signals;
+        const projectId = projectId;
+        const received_signals = received_signals;
 
         const accessPointList: AccessPoint[] = await getAccessPointsByID(projectId);
         const initiallyReceivedRSSValues: Map<string, number> = signalsToMap(received_signals);
