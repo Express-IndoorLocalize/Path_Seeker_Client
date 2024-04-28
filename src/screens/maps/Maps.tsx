@@ -13,6 +13,7 @@ import SearchBarCustom from "../../components/searchBar/searchBar";
 import HeaderOptions from "../../components/headerBar/HeaderBar";
 import { useLogin } from '../../context/LoginProvider';
 import { allMaps } from "./mapData";
+import { buildingImages } from "../../constants/images";
 
 
 export default function Maps({ navigation }:any) {
@@ -66,14 +67,15 @@ export default function Maps({ navigation }:any) {
             key={item.id}
         >
             <Image
-            source={require('../../assets/maps/indoorMap.png')}
+            source={buildingImages[item.buildingImg]}
             style={styles.cardImage}
             />
             <View style={styles.cardDetails}>
             <Text style={styles.cardTitle}>{item.buildingName}</Text>
             <Text style={styles.cardText}></Text>
             <Text style={styles.cardText}>Floor Name: {item.floorName}</Text>
-            <Text style={styles.cardText}>Description: {(item.description).replace(/\n/g, ' ')}</Text>
+            <Text style={styles.cardText}></Text>
+            <Text style={styles.cardText}>{(item.description).replace(/\n/g, ' ')}</Text>
             <Text style={styles.cardText}></Text>
             </View>
         </TouchableOpacity>
@@ -112,8 +114,8 @@ const styles = StyleSheet.create({
     padding: 10,
   },
   cardImage: {
-    width: 80,
-    height: 80,
+    width: 120,
+    height: 120,
     borderRadius: 4,
   },
   cardDetails: {
