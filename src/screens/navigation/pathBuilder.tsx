@@ -1,7 +1,8 @@
 import React from 'react';
-import { View, StyleSheet, Image, Dimensions } from 'react-native';
+import { View, StyleSheet, Image, Dimensions, TouchableOpacity } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import Icon from 'react-native-vector-icons/FontAwesome';
 
 const screenWidth = Dimensions.get('window').width;
 const screenHeight = Dimensions.get('window').height;
@@ -11,6 +12,12 @@ export default function NavPath(props: any) {
   const startCordinate = coordinates[0] ?? {x:0,y:0};
   const endCordinate = coordinates[coordinates.length-1] ?? {x:0,y:0};
   const markerDetails = { start: {x:startCordinate.x, y:startCordinate.y}, end:{x:endCordinate.x, y:endCordinate.y }};
+
+  const handleClearMap = () => {
+    console.log('pres close');
+    props.setUserNeedsNavigating(false);
+    props.setNavigatingCoordinates([]);
+  }
 
   const renderLines = () => {
     if (!coordinates || coordinates.length < 2) return null;
@@ -28,6 +35,9 @@ export default function NavPath(props: any) {
   if (props.userNeedsNavigating) {
     return (
       <>
+      <TouchableOpacity style={styles.mapClear} onPress={()=>{handleClearMap()}}>
+        <Icon name="times-rectangle" size={30} color="black" />
+      </TouchableOpacity>
       <MaterialCommunityIcons
         style={[
           styles.marker,
@@ -76,5 +86,12 @@ const styles = StyleSheet.create({
   },
   marker: {
     position: 'absolute',
+  },
+  mapClear: {
+    position: 'absolute',
+    top: 50,
+    right: 20,
+    borderRadius: 20,
+    // backgroundColor: 'black',
   },
 });

@@ -2,7 +2,8 @@ import { useEffect, useState } from 'react';
 import {
   View,
   Image,
-  StyleSheet, ActivityIndicator
+  StyleSheet, ActivityIndicator,
+  TouchableOpacity
 } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import Toast from 'react-native-toast-message';
@@ -33,7 +34,7 @@ export default function Navigation({ navigation, route }: any) {
   useEffect(() => {
     const intervalId = setInterval(async () => {
       if (!isNavigating) {
-        await getLiveLocation();
+        // await getLiveLocation();
       }
     }, 3000);
     return () => clearInterval(intervalId);
@@ -202,7 +203,7 @@ export default function Navigation({ navigation, route }: any) {
         size={30}
       />
 
-      <NavPath userNeedsNavigating={userNeedsNavigating} coordinates={navigatingCoordinates}/>
+      <NavPath userNeedsNavigating={userNeedsNavigating} coordinates={navigatingCoordinates} setUserNeedsNavigating={setUserNeedsNavigating} setNavigatingCoordinates={setNavigatingCoordinates}/>
 
       <DropdownComponent isDestination={false} locationValue={currentLocation} setLocation={setCurrentLocation} locations={locations} style={styles.dropDownStyle} />
       <DropdownComponent isDestination={true} locationValue={destinationLocation} setLocation={setDestinationLocation} locations={locations} style={styles.dropDownStyle} />
