@@ -13,6 +13,7 @@ import { Dimensions } from 'react-native';
 import { Button, DropdownComponent } from '../../components';
 import { locations } from './locations';
 import NavPath from './pathBuilder';
+import { findNearestCoordinates } from '../../helpers/enhanceNavigation';
 
 const screenWidth = Dimensions.get('window').width;
 const screenHeight = Dimensions.get('window').height;
@@ -96,7 +97,6 @@ export default function Navigation({ navigation, route }: any) {
         const filteredData = list.filter(item => item.SSID === "UoM_Wireless" || item.SSID === "eduroam");
         positionData.received_signals = filteredData;
         const json_to_send = JSON.stringify(modifyJson(positionData));
-        console.log('json_to_send: ', json_to_send);
         const url = 'https://indoor-localize-server.onrender.com/api/positioning/calculate_position';
         const requestOptions = {
           method: 'POST',
@@ -105,7 +105,6 @@ export default function Navigation({ navigation, route }: any) {
           },
           body: json_to_send
         };
-        console.log('getting live location');
         fetch(url, requestOptions)
           .then(response => {
             if (!response.ok) {
@@ -116,7 +115,11 @@ export default function Navigation({ navigation, route }: any) {
           .then(data => {
             // Handle response data
             console.log('live updating:', data);
-            const liveLoc = { x: data?.message?.x, y: data?.message?.y };
+            const predLocation = { x: data?.message?.x, y: data?.message?.y };
+            console.log('predLocation: ',predLocation);
+            const enhancedXY = findNearestCoordinates(predLocation.x, predLocation.y);
+            console.log('enhancedXY: ',enhancedXY);
+            const liveLoc = { x: enhancedXY.x, y: enhancedXY.y };
             setMarkerPosition(liveLoc);
           })
           .catch(error => {

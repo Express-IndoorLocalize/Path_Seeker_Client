@@ -124,6 +124,7 @@ const styles = StyleSheet.create({
   },
   cardTitle: {
     fontSize: 18,
+    color: 'black',
     fontWeight: "bold",
   },
   cardText: {
