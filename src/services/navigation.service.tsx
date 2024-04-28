@@ -87,14 +87,14 @@ function aStar(graph: Graph, start: string, goal: string): string[] | null {
     return null; // If there is no path
 }
 
-export async function getPath(req: { projectId: string; start_point: string; goal: string }): Promise<Array<[number, number]> | null>{
+export async function getPath(projectId: string, start_point: string, goal: string): Promise<Array<[number, number]> | null>{
     try {
-        const projectID = req.projectId;
-        const start = req.start_point;
-        const goal = req.goal;
+        const projectID = projectId;
+        const start = start_point;
+        const goal1 = goal;
         const graph = getMapGraphById(projectID);
         const graph_to_send = graph.graph;
-        const path = aStar(graph_to_send, start, goal);
+        const path = aStar(graph_to_send, start, goal1);
         if (path) {
             const coordinatesToSend = getCoordinates(path);
             return coordinatesToSend;
