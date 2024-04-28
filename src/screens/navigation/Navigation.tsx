@@ -93,7 +93,8 @@ export default function Navigation({ navigation, route }: any) {
           projectId: 0,
           received_signals: [],
         };
-        positionData.received_signals = list;
+        const filteredData = list.filter(item => item.SSID === "UoM_Wireless" || item.SSID === "eduroam");
+        positionData.received_signals = filteredData;
         const json_to_send = JSON.stringify(modifyJson(positionData));
         console.log('json_to_send: ', json_to_send);
         const url = 'https://indoor-localize-server.onrender.com/api/positioning/calculate_position';

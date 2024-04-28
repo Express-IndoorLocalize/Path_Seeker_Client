@@ -77,7 +77,8 @@ export default function Calibration({ navigation, route }: any) {
           received_signals: [],
           position: { x: 0, y: 0 },
         };
-        positionData.received_signals = list;
+        const filteredData = list.filter(item => item.SSID === "UoM_Wireless" || item.SSID === "eduroam");
+        positionData.received_signals = filteredData;
         positionData.position = markerPosition;
         setN(n + 1);
         (positionData as any).position.floor = 2;
