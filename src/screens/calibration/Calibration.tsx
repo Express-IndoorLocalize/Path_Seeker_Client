@@ -70,7 +70,7 @@ export default function Calibration({ navigation, route }: any) {
           console.log('Cannot get current SSID!');
         },
       );
-      WifiManager.loadWifiList().then((list: any) => {
+      WifiManager.reScanAndLoadWifiList().then((list: any) => {
         const positionData = {
           projectId: 0,
           calibrationpointID: n,

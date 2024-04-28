@@ -34,7 +34,7 @@ export default function Navigation({ navigation, route }: any) {
   useEffect(() => {
     const intervalId = setInterval(async () => {
       if (!isNavigating) {
-        // await getLiveLocation();
+        await getLiveLocation();
       }
     }, 3000);
     return () => clearInterval(intervalId);
@@ -80,7 +80,7 @@ export default function Navigation({ navigation, route }: any) {
   const getLiveLocation = async () => {
     try {
       permission();
-      WifiManager.getCurrentWifiSSID().then(
+      WifiManager.reScanAndLoadWifiList().then(
         ssid => {
           console.log('Your current connected wifi SSID is ' + ssid);
         },
