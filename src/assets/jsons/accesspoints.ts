@@ -1,4 +1,4 @@
-[{
+export default accessPoints = [{
   "_id": {
     "$oid": "662e2f07eb3a75860347bc1e"
   },

@@ -47,13 +47,13 @@ const calculatePosition = async (req: { projectId: string; received_signals: Sig
         const projectId = req.projectId;
         const received_signals = req.received_signals;
 
-        const accessPointList: AccessPoint[] = await getAccessPointsByID(projectId);
+        const accessPointList: any = getAccessPointsByID(projectId);
         const initiallyReceivedRSSValues: Map<string, number> = signalsToMap(received_signals);
 
         const receivedDatabaseRSSValues: Map<string, number> = new Map();
         let notReceivedCount = 0;
 
-        accessPointList.forEach((accessPoint) => {
+        accessPointList.forEach((accessPoint:any) => {
             if (!initiallyReceivedRSSValues.has(accessPoint.bssid)) {
                 notReceivedCount++;
                 receivedDatabaseRSSValues.set(accessPoint.bssid, rssNotReceived);

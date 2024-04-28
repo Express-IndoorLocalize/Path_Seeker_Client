@@ -14,6 +14,7 @@ import { Button, DropdownComponent } from '../../components';
 import { locations } from './locations';
 import NavPath from './pathBuilder';
 import { findNearestCoordinates } from '../../helpers/enhanceNavigation';
+import { calculatePosition } from '../../services/calculatePosition.service';
 
 const screenWidth = Dimensions.get('window').width;
 const screenHeight = Dimensions.get('window').height;
@@ -96,36 +97,47 @@ export default function Navigation({ navigation, route }: any) {
         };
         const filteredData = list.filter(item => item.SSID === "UoM_Wireless" || item.SSID === "eduroam");
         positionData.received_signals = filteredData;
-        const json_to_send = JSON.stringify(modifyJson(positionData));
-        const url = 'https://indoor-localize-server.onrender.com/api/positioning/calculate_position';
-        const requestOptions = {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: json_to_send
-        };
-        fetch(url, requestOptions)
-          .then(response => {
-            if (!response.ok) {
-              throw new Error('Network response was not ok');
-            }
-            return response.json();
-          })
-          .then(data => {
-            // Handle response data
-            console.log('live updating:', data);
-            const predLocation = { x: data?.message?.x, y: data?.message?.y };
-            console.log('predLocation: ',predLocation);
-            const enhancedXY = findNearestCoordinates(predLocation.x, predLocation.y);
-            console.log('enhancedXY: ',enhancedXY);
-            const liveLoc = { x: enhancedXY.x, y: enhancedXY.y };
-            setMarkerPosition(liveLoc);
-          })
-          .catch(error => {
-            // Handle errors
-            console.error('There was a problem with the POST request:', error);
-          });
+        const modifiedData = modifyJson(positionData);
+        const data:any = calculatePosition(modifiedData);
+        console.log('live updating:', data);
+        const predLocation = { x: data.x, y: data.y };
+        console.log('predLocation: ',predLocation);
+        const enhancedXY = findNearestCoordinates(predLocation.x, predLocation.y);
+        console.log('enhancedXY: ',enhancedXY);
+        const liveLoc = { x: enhancedXY.x, y: enhancedXY.y };
+        setMarkerPosition(liveLoc);
+
+        // const json_to_send = JSON.stringify(modifyJson(positionData));
+        // const url = 'https://indoor-localize-server.onrender.com/api/positioning/calculate_position';
+        // const requestOptions = {
+        //   method: 'POST',
+        //   headers: {
+        //     'Content-Type': 'application/json'
+        //   },
+        //   body: json_to_send
+        // };
+        // fetch(url, requestOptions)
+        //   .then(response => {
+        //     if (!response.ok) {
+        //       throw new Error('Network response was not ok');
+        //     }
+        //     return response.json();
+        //   })
+        //   .then(data => {
+        //     // Handle response data
+        //     console.log('live updating:', data);
+        //     const predLocation = { x: data?.message?.x, y: data?.message?.y };
+        //     console.log('predLocation: ',predLocation);
+        //     const enhancedXY = findNearestCoordinates(predLocation.x, predLocation.y);
+        //     console.log('enhancedXY: ',enhancedXY);
+        //     const liveLoc = { x: enhancedXY.x, y: enhancedXY.y };
+        //     setMarkerPosition(liveLoc);
+        //   })
+        //   .catch(error => {
+        //     // Handle errors
+        //     console.error('There was a problem with the POST request:', error);
+        //   });
+          
       });
     } catch (e) {
       console.error('Error getting live location:', e);
@@ -143,7 +155,8 @@ export default function Navigation({ navigation, route }: any) {
         'projectId': 0,
         'start_point': currentLocation,
         'goal': destinationLocation
-      }
+      };
+
       const json_to_send = JSON.stringify(postData)
       const url = 'https://indoor-localize-server.onrender.com/api/navigating/get_path';
       const requestOptions = {
