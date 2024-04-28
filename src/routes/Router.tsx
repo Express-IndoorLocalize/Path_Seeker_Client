@@ -29,7 +29,9 @@ function MainNavigation(){
 
 function AdminNavigation(){
   return(
-    <Stack.Navigator screenOptions={{headerShown:false}}>
+    <Stack.Navigator initialRouteName="adminMaps" screenOptions={({ route }) => ({
+      headerShown: (route.name === "adminMaps"),
+    })}>
       <Stack.Screen name='adminMaps' component={Maps} />
       <Stack.Screen name='calibration' component={Calibration} />
     </Stack.Navigator>
