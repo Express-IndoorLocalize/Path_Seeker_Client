@@ -32,7 +32,7 @@ export default function NavPath(props: any) {
 
     return <Path d={pathData} stroke="blue" strokeWidth="5" fill="none" />;
   };
-  if (props.userNeedsNavigating) {
+  if (props.userNeedsNavigating && coordinates.length > 0) {
     return (
       <>
       <TouchableOpacity style={styles.mapClear} onPress={()=>{handleClearMap()}}>
@@ -68,7 +68,7 @@ export default function NavPath(props: any) {
       </>
     );
   } else {
-    <></>
+    return(<></>);
   }
 }
 

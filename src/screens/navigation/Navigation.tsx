@@ -38,7 +38,7 @@ export default function Navigation({ navigation, route }: any) {
   const [destinationLocation, setDestinationLocation] = useState(null);
   const [isNavigating, setNavigating] = useState<boolean>(false);
   const [userNeedsNavigating, setUserNeedsNavigating] = useState<boolean>(false);
-
+  
   const setAngleWithXY = (x:any,y:any) => {
     const angleX = x - xyzAngles.x;
     const angleY = y - xyzAngles.y;
