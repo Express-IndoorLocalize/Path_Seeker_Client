@@ -7,13 +7,15 @@ interface CalibrationPoint {
 
 
 
-const getCalibrationPointsByID = async (projectID: string): Promise<CalibrationPoint[] | void> => {
+const getCalibrationPointsByID = async (projectID: string): Promise<CalibrationPoint[]> => {
+    const nullArray : any = [];
     try {
         const filteredPoints = calibrationpoint.filter(point => point.projectId === projectID);
         return filteredPoints;
     } catch (err) {
         console.error(err);
     }
+    return nullArray;
 };
 
 export { getCalibrationPointsByID };

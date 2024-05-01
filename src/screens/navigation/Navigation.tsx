@@ -16,12 +16,21 @@ import NavPath from './pathBuilder';
 import { findNearestCoordinates } from '../../helpers/enhanceNavigation';
 import { calculatePosition } from '../../services/calculatePosition.service';
 
+import {
+  accelerometer,
+  gyroscope,
+  setUpdateIntervalForType,
+  SensorTypes
+} from "react-native-sensors";
+import { map, filter } from "rxjs/operators";
+
 const screenWidth = Dimensions.get('window').width;
 const screenHeight = Dimensions.get('window').height;
 
 export default function Navigation({ navigation, route }: any) {
   const { mapDetails }: any = route.params;
   const [markerPosition, setMarkerPosition] = useState({ x: 120, y: 620 });
+  const [xyzAngles, setXYZAngles] = useState({ x: 0, y: 0, z:0 });
   const [angle, setAngle] = useState(0);
   const [loader, setLoader] = useState(false);
   const [currentLocation, setCurrentLocation] = useState(null);
@@ -30,6 +39,33 @@ export default function Navigation({ navigation, route }: any) {
   const [isNavigating, setNavigating] = useState<boolean>(false);
   const [userNeedsNavigating, setUserNeedsNavigating] = useState<boolean>(false);
 
+  const setAngleWithXY = (x:any,y:any) => {
+    const angleX = x - xyzAngles.x;
+    const angleY = y - xyzAngles.y;
+    const newAngles = { x: x, y: y, z:0 };
+    setXYZAngles(newAngles);
+    const rotationAngle = Math.atan2(angleY, angleX);
+    setAngle(rotationAngle * (180 / Math.PI));
+    console.log("Rotation Angle (degrees):", rotationAngle * (180 / Math.PI));
+  }
+
+  // setUpdateIntervalForType(SensorTypes.gyroscope, 100); 
+  // const subscription = gyroscope
+  // .subscribe(({ x, y, z, timestamp }) => {
+  //   console.log({ x, y, z, timestamp })
+  //   const angleX = x - xyzAngles.x;
+  //   const angleY = y - xyzAngles.y;
+  //   const angleZ = z - xyzAngles.z;
+  //   const newAngles = { x: x, y: y, z:z };
+  //   setXYZAngles(newAngles);
+  //   const rotationAngle = Math.atan2(angleY, angleX);
+  //   setAngle(rotationAngle * (180 / Math.PI));
+  //   console.log("Rotation Angle (degrees):", rotationAngle * (180 / Math.PI));
+  // }
+  // );
+  // setTimeout(() => {
+  //   subscription.unsubscribe();
+  // }, 3000);
 
   const indoorMap = require('../../assets/maps/indoorMap.png');
 
@@ -38,7 +74,7 @@ export default function Navigation({ navigation, route }: any) {
       if (!isNavigating) {
         await getLiveLocation();
       }
-    }, 3000);
+    }, 1000);
     return () => clearInterval(intervalId);
   }, []);
 
@@ -98,45 +134,50 @@ export default function Navigation({ navigation, route }: any) {
         const filteredData = list.filter(item => item.SSID === "UoM_Wireless" || item.SSID === "eduroam");
         positionData.received_signals = filteredData;
         const modifiedData = modifyJson(positionData);
-        const data:any = calculatePosition(modifiedData);
-        console.log('live updating:', data);
-        const predLocation = { x: data.x, y: data.y };
-        console.log('predLocation: ',predLocation);
-        const enhancedXY = findNearestCoordinates(predLocation.x, predLocation.y);
-        console.log('enhancedXY: ',enhancedXY);
-        const liveLoc = { x: enhancedXY.x, y: enhancedXY.y };
-        setMarkerPosition(liveLoc);
 
-        // const json_to_send = JSON.stringify(modifyJson(positionData));
-        // const url = 'https://indoor-localize-server.onrender.com/api/positioning/calculate_position';
-        // const requestOptions = {
-        //   method: 'POST',
-        //   headers: {
-        //     'Content-Type': 'application/json'
-        //   },
-        //   body: json_to_send
-        // };
-        // fetch(url, requestOptions)
-        //   .then(response => {
-        //     if (!response.ok) {
-        //       throw new Error('Network response was not ok');
-        //     }
-        //     return response.json();
-        //   })
-        //   .then(data => {
-        //     // Handle response data
-        //     console.log('live updating:', data);
-        //     const predLocation = { x: data?.message?.x, y: data?.message?.y };
-        //     console.log('predLocation: ',predLocation);
-        //     const enhancedXY = findNearestCoordinates(predLocation.x, predLocation.y);
-        //     console.log('enhancedXY: ',enhancedXY);
-        //     const liveLoc = { x: enhancedXY.x, y: enhancedXY.y };
-        //     setMarkerPosition(liveLoc);
-        //   })
-        //   .catch(error => {
-        //     // Handle errors
-        //     console.error('There was a problem with the POST request:', error);
-        //   });
+        //run local
+        // const jsonData: any = JSON.stringify(modifiedData);
+        // const data:any = calculatePosition(jsonData.projectId, jsonData.received_signals);
+        // console.log('live updating:', data);
+        // const predLocation = { x: data.x, y: data.y };
+        // console.log('predLocation: ',predLocation);
+        // const enhancedXY = findNearestCoordinates(predLocation.x, predLocation.y);
+        // console.log('enhancedXY: ',enhancedXY);
+        // const liveLoc = { x: enhancedXY.x, y: enhancedXY.y };
+        // setMarkerPosition(liveLoc);
+
+        //server
+        const json_to_send = JSON.stringify(modifiedData);
+        const url = 'https://indoor-localize-server.onrender.com/api/positioning/calculate_position';
+        const requestOptions = {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: json_to_send
+        };
+        fetch(url, requestOptions)
+          .then(response => {
+            if (!response.ok) {
+              throw new Error('Network response was not ok');
+            }
+            return response.json();
+          })
+          .then(data => {
+            // Handle response data
+            console.log('live updating:', data);
+            const predLocation = { x: data?.message?.x, y: data?.message?.y };
+            console.log('predLocation: ',predLocation);
+            const enhancedXY = findNearestCoordinates(predLocation.x, predLocation.y);
+            console.log('enhancedXY: ',enhancedXY);
+            const liveLoc = { x: enhancedXY.x, y: enhancedXY.y };
+            setAngleWithXY(liveLoc.x, liveLoc.y);
+            setMarkerPosition(liveLoc);
+          })
+          .catch(error => {
+            // Handle errors
+            console.error('There was a problem with the POST request:', error);
+          });
           
       });
     } catch (e) {

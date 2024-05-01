@@ -42,12 +42,9 @@ interface Position {
     floor: number;
 }
 
-const calculatePosition = async (projectId: string, received_signals: Signal[]): Promise<Position | void> => {
+const calculatePosition = async (projectId: string, received_signals: any[]): Promise<Position | void> => {
     try {
-        const projectId = projectId;
-        const received_signals = received_signals;
-
-        const accessPointList: any = getAccessPointsByID(projectId);
+        const accessPointList: any[] = getAccessPointsByID(projectId);
         const initiallyReceivedRSSValues: Map<string, number> = signalsToMap(received_signals);
 
         const receivedDatabaseRSSValues: Map<string, number> = new Map();
@@ -227,7 +224,7 @@ const WKNN_algorithm = async (
 
 const ml_knn = async (receivedDatabaseRSSValues: Map<string, number>, projectId: string): Promise<number[][]> => {
     try {
-        const calibrationPointList: CalibrationPoint[] = await getCalibrationPointsByID(projectId);
+        const calibrationPointList: any[] = await getCalibrationPointsByID(projectId);
         const { signal_list, rssList, coordinateList } = await prepare_data(calibrationPointList, projectId, receivedDatabaseRSSValues);
         const KNN = new KNN_Model(rssList, coordinateList, { k: 3 });
         const predictions = KNN.predict(signal_list);
