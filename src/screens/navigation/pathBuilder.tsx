@@ -35,9 +35,9 @@ export default function NavPath(props: any) {
   if (props.userNeedsNavigating && coordinates.length > 0) {
     return (
       <>
-      <TouchableOpacity style={styles.mapClear} onPress={()=>{handleClearMap()}}>
+      {/* <TouchableOpacity style={styles.mapClear} onPress={()=>{handleClearMap()}}>
         <Icon name="times-rectangle" size={30} color="black" />
-      </TouchableOpacity>
+      </TouchableOpacity> */}
       <MaterialCommunityIcons
         style={[
           styles.marker,
